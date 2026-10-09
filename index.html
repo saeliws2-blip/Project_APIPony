@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Little Pony - Card Collection</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Kanit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e8eaf6 100%);
+            background-attachment: fixed;
+            color: #4a154b;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           LOGIN SCREEN
+        ========================= */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #ec407a 0%, #ab47bc 50%, #7e57c2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 30px;
+            border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 3px solid #f48fb1;
+        }
+
+        .login-card h2 {
+            margin-top: 0;
+            color: #8e24aa;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0 18px;
+            border: 2px solid #ce93d8;
+            border-radius: 14px;
+            font-size: 16px;
+            font-family: 'Kanit';
+            outline: none;
+        }
+
+        .login-submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #ec407a, #ab47bc) !important;
+            color: #ffffff !important;
+            font-size: 18px !important;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(236, 64, 122, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .login-submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* =========================
+           HEADER & NAV
+        ========================= */
+        header {
+            background: linear-gradient(90deg, #ec407a, #ab47bc, #7e57c2);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 6px 20px rgba(124, 82, 149, 0.25);
+        }
+
+        header h1 {
+            margin: 0 0 5px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-bar {
+            position: absolute;
+            right: 20px;
+            top: 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-badge {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(5px);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 15px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 14px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: #7e57c2;
+            border: 2px solid #7e57c2;
+            padding: 8px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            font-family: 'Kanit';
+            transition: all 0.25s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: linear-gradient(90deg, #ec407a, #ab47bc);
+            color: white;
+            border-color: transparent;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* =========================
+           CONTROLS (FILTERS)
+        ========================= */
+        .controls {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 1fr;
+            gap: 12px;
+            margin-bottom: 18px;
+            background: white;
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+        }
+
+        input, select {
+            padding: 12px 16px;
+            border: 2px solid #f3e5f5;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Kanit';
+            outline: none;
+            background: #faf5fb;
+            color: #4a154b;
+        }
+
+        .count-badge {
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #8e24aa;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid #f06292;
+            box-shadow: 0 4px 12px rgba(236, 64, 122, 0.15);
+        }
+
+        /* =========================
+           CARDS GRID & STYLES
+        ========================= */
+        .characters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 22px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(124, 82, 149, 0.08);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #fce4ec;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(171, 71, 188, 0.22);
+        }
+
+        .card.mane6 {
+            border: 2px solid #ec407a;
+            background: linear-gradient(180deg, #ffffff 0%, #fff0f5 100%);
+        }
+
+        .card.mane6::after {
+            content: '👑 ตัวละครหลัก';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #ec407a;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .card.rarity-5 {
+            border: 2px solid #ffd700;
+            background: linear-gradient(180deg, #ffffff 0%, #fffde7 100%);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.35);
+        }
+
+        .card.rarity-5::before {
+            content: '✨ LEGENDARY';
+            position: absolute;
+            top: 10px;
+            right: -28px;
+            background: linear-gradient(45deg, #ffd700, #ff9800);
+            color: #5d4037;
+            font-size: 9px;
+            font-weight: bold;
+            padding: 3px 30px;
+            transform: rotate(45deg);
+        }
+
+        .card.rarity-4 {
+            border: 2px solid #ce93d8;
+            background: linear-gradient(180deg, #ffffff 0%, #f3e5f5 100%);
+        }
+
+        .card img {
+            width: 100%;
+            height: 165px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.12));
+        }
+
+        .card h3 {
+            margin: 12px 0 6px;
+            font-size: 19px;
+            color: #6a1b9a;
+        }
+
+        .stars {
+            color: #ffb300;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .price-tag {
+            background: linear-gradient(90deg, #e8f5e9, #c8e6c9);
+            color: #2e7d32;
+            font-weight: 600;
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        /* =========================
+           MY COLLECTION
+        ========================= */
+        .favorite-box {
+            background: white;
+            padding: 30px;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(124, 82, 149, 0.1);
+            border: 2px solid #f8bbd0;
+        }
+
+        .top3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .slot {
+            min-height: 250px;
+            border: 3px dashed #f48fb1;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            background: #fff8fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slot img {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            font-family: 'Kanit';
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #ec407a, #ab47bc);
+            color: white;
+        }
+
+        .btn-replace {
+            background: linear-gradient(90deg, #ffa726, #fb8c00);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef5350;
+            color: white;
+            margin-top: 10px;
+        }
+
+        button:disabled {
+            background: #e0e0e0 !important;
+            color: #9e9e9e !important;
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           MODAL
+        ========================= */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(74, 21, 75, 0.65);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 9500;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 28px;
+            padding: 30px;
+            position: relative;
+            border: 3px solid #f48fb1;
+        }
+
+        .close {
+            position: absolute;
+            right: 22px;
+            top: 18px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #ab47bc;
+        }
+
+        .character-detail {
+            text-align: center;
+        }
+
+        .character-detail img {
+            width: 190px;
+            height: 190px;
+            object-fit: contain;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .replace-menu {
+            margin-top: 18px;
+            padding: 16px;
+            background: #fff8e1;
+            border: 2px dashed #ffa726;
+            border-radius: 16px;
+            display: none;
+        }
+
+        .replace-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .info-list {
+            text-align: left;
+            background: #faf5fb;
+            padding: 18px;
+            border-radius: 16px;
+            margin-top: 18px;
+        }
+
+        .info-list p {
+            margin: 8px 0;
+            font-size: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- หน้า LOGIN -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+        <h2>🦄 เข้าสู่ระบบ</h2>
+        <p style="color:#666; font-size:15px; margin-bottom:18px;">
+            กรุณากรอกชื่อผู้ใช้งานเพื่อเริ่มสะสมการ์ด
+        </p>
+
+        <form id="loginForm">
+            <input 
+                type="text" 
+                id="loginUsername" 
+                placeholder="กรอกชื่อผู้ใช้งานที่นี่..." 
+            >
+            <p id="loginError" role="alert" style="display:none; color:#c62828; margin:0 0 12px;"></p>
+            <button 
+                type="submit" 
+                class="login-submit-btn"
+            >
+                🚀 เข้าสู่ระบบ
+            </button>
+        </form>
+    </div>
+</div>
+
+<header>
+    <h1>🦄 My Little Pony Card Collection</h1>
+    <p style="margin:0; opacity: 0.9;">สะสมการ์ดโพนี่ และค้นหาตัวละครตามซีซัน</p>
+    <div class="user-bar">
+        <span id="userBadge" class="user-badge">👤 ผู้ใช้: -</span>
+        <button class="btn-danger" style="margin:0; padding:6px 14px; border-radius:15px;" onclick="handleLogout()">ออกจากระบบ</button>
+    </div>
+</header>
+
+<nav>
+    <button class="nav-btn active" onclick="switchPage('all-cards')">🔎 การ์ดโพนี่ทั้งหมด</button>
+    <button class="nav-btn" onclick="switchPage('my-collection')">⭐ การ์ดที่สะสมไว้ (<span id="collectionCount">0</span>/3)</button>
+</nav>
+
+<div class="container">
+
+    <!-- PAGE 1: ALL CARDS -->
+    <div id="page-all-cards" class="page active">
+        <h2 style="color: #6a1b9a; margin-top:0;">🔎 ค้นหาและคัดกรองการ์ดโพนี่</h2>
+        
+        <div class="controls">
+            <input type="text" id="search" placeholder="🔍 ค้นหาชื่อตัวละคร...">
+
+            <select id="seasonFilter">
+                <option value="all">🌈 ทุกซีซัน</option>
+                <option value="1">Season 1</option>
+                <option value="2">Season 2</option>
+                <option value="3">Season 3</option>
+                <option value="4">Season 4</option>
+                <option value="5">Season 5</option>
+                <option value="6">Season 6</option>
+                <option value="7">Season 7</option>
+                <option value="8">Season 8</option>
+                <option value="9">Season 9</option>
+            </select>
+
+            <select id="sort">
+                <option value="az">ชื่อ A - Z</option>
+                <option value="za">ชื่อ Z - A</option>
+            </select>
+        </div>
+
+        <!-- ป้ายแสดงจำนวนตัวละครตาม Season -->
+        <div class="count-badge">
+            📊 <span id="seasonCountDisplay">กำลังคำนวณจำนวนตัวละคร...</span>
+        </div>
+
+        <div id="characters" class="characters">
+            <div style="text-align:center; grid-column:1/-1; padding:50px; font-size:18px;">✨ กำลังโหลดข้อมูลการ์ดโพนี่...</div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: MY COLLECTION -->
+    <div id="page-my-collection" class="page">
+        <div class="favorite-box">
+            <h2 style="text-align:center; margin-top:0; color:#6a1b9a;">⭐ การ์ดม้าโพนี่ที่คุณสะสมไว้ (My Top 3)</h2>
+            <div id="top3" class="top3"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- CHARACTER DETAIL MODAL -->
+<div id="characterModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeCharacterModal()">×</span>
+        <div class="character-detail">
+            <img id="modalImage" src="" alt="Character">
+            <h2 id="modalName" style="margin: 12px 0 4px; color:#6a1b9a;"></h2>
+            
+            <div id="modalRarityStars" class="stars" style="font-size: 20px;"></div>
+            <div id="modalRarityText" style="font-size: 14px; color: #7b1fa2; font-weight:600; margin-bottom: 8px;"></div>
+            <div id="modalPrice" class="price-tag" style="font-size: 16px;"></div>
+
+            <div class="info-list">
+                <p><strong>เพศ:</strong> <span id="modalSex"></span></p>
+                <p><strong>ความสามารถ / อาชีพ:</strong> <span id="modalAbility"></span></p>
+                <p><strong>จำนวนตอนที่ปรากฏ:</strong> <span id="modalEpisodes">-</span></p>
+                <p><strong>ซีซันที่ปรากฏ:</strong> <span id="modalSeasons">-</span></p>
+            </div>
+
+            <div class="action-group">
+                <button id="addBtn" class="btn-primary" onclick="addCharacter()">
+                    + เพิ่มใน My Top 3
+                </button>
+
+                <button id="replacePromptBtn" class="btn-replace" style="display: none;" onclick="toggleReplaceMenu()">
+                    🔄 คุณต้องการที่จะแทนม้าโพนี่ในตำแหน่งไหนหรือไม่
+                </button>
+            </div>
+
+            <div id="replaceMenu" class="replace-menu">
+                <h4 style="margin:0 0 10px; color:#e65100;">เลือกตำแหน่งที่ต้องการแทนที่:</h4>
+                <div id="replaceOptions" class="replace-options"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+let characters = [];
+let top3 = [];
+let selectedCharacter = null;
+let currentUser = null;
+
+const mane6List = [
+    "twilight sparkle",
+    "rainbow dash",
+    "pinkie pie",
+    "fluttershy",
+    "rarity",
+    "applejack"
+];
+
+function isMane6(characterName) {
+    if (!characterName) return false;
+    const nameLower = characterName.toLowerCase();
+    return mane6List.some(mane => nameLower.includes(mane));
+}
+
+// ฟังก์ชันตรวจสอบว่าตัวละครปรากฏในซีซันที่เลือกหรือไม่
+function checkSeasonMatch(characterSeasons, selectedSeason) {
+    if (selectedSeason === "all" || !selectedSeason) return true;
+    if (characterSeasons === undefined || characterSeasons === null) return false;
+
+    const targetSeasonStr = String(selectedSeason).trim();
+
+    if (Array.isArray(characterSeasons)) {
+        return characterSeasons.some(s => String(s).trim() === targetSeasonStr);
+    }
+
+    if (typeof characterSeasons === "number") {
+        return String(characterSeasons) === targetSeasonStr;
+    }
+
+    if (typeof characterSeasons === "string") {
+        const seasonsArr = characterSeasons.split(",").map(s => s.replace(/\D/g, "").trim());
+        return seasonsArr.includes(targetSeasonStr);
+    }
+
+    return false;
+}
+
+function handleLogin() {
+    const usernameInput = document.getElementById("loginUsername");
+    const loginError = document.getElementById("loginError");
+    const username = usernameInput ? usernameInput.value.trim() : "";
+    if (!username) {
+        loginError.textContent = "กรุณากรอกชื่อผู้ใช้งานก่อนเข้าสู่ระบบ";
+        loginError.style.display = "block";
+        usernameInput.focus();
+        return;
+    }
+    loginError.textContent = "";
+    loginError.style.display = "none";
+    currentUser = username;
+    document.getElementById("userBadge").textContent = `👤 ผู้ใช้: ${currentUser}`;
+    document.getElementById("loginOverlay").style.display = "none";
+
+    loadCharacters();
+}
+
+document.getElementById("loginForm").addEventListener("submit", event => {
+    event.preventDefault();
+    handleLogin();
+});
+
+function handleLogout() {
+    currentUser = null;
+    document.getElementById("loginUsername").value = "";
+    document.getElementById("loginOverlay").style.display = "flex";
+}
+
+function switchPage(pageName) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+
+    if (pageName === 'all-cards') {
+        document.getElementById("page-all-cards").classList.add("active");
+        document.querySelectorAll(".nav-btn")[0].classList.add("active");
+    } else {
+        document.getElementById("page-my-collection").classList.add("active");
+        document.querySelectorAll(".nav-btn")[1].classList.add("active");
+    }
+}
+
+// =================================================
+// เกณฑ์วัดระดับความหายากตามลำดับขั้น/ฐานันดรในเรื่อง
+// =================================================
+function getCardPriceAndRarity(character) {
+    const name = (character.name || "").toLowerCase();
+    const occupation = (character.occupation || "").toLowerCase();
+    const kind = Array.isArray(character.kind)
+        ? character.kind.join(" ").toLowerCase()
+        : String(character.kind || "").toLowerCase();
+
+    let stars = 1;
+    let price = 300;
+    let rarityText = "Common (ชาวเมืองทั่วไป / โพนี่ดิน)";
+
+    // 1. ระดับเจ้าหญิง / ราชวงศ์ / อลิคอร์น / ตัวร้ายระดับตำนาน (5 ดาว - Legendary)
+    const isRoyalty = name.includes("princess") || name.includes("queen") || name.includes("king") ||
+                      occupation.includes("princess") || occupation.includes("ruler") || occupation.includes("queen") ||
+                      kind.includes("alicorn") || name.includes("celestia") || name.includes("luna") ||
+                      name.includes("cadance") || name.includes("discord") || name.includes("chrysalis") ||
+                      name.includes("tirek") || name.includes("sombra") || name.includes("flurry heart");
+
+    // 2. ระดับตัวละครหลัก Mane 6 / ผู้พิทักษ์มิตรภาพ / CMC (4 ดาว - Epic)
+    const isKeyChar = isMane6(character.name) || name.includes("starlight glimmer") ||
+                      name.includes("sunset shimmer") || name.includes("spike") ||
+                      name.includes("apple bloom") || name.includes("sweetie belle") || name.includes("scootaloo") ||
+                      occupation.includes("cutie mark crusader");
+
+    // 3. ระดับตัวละครสมทบเด่น / Wonderbolts / ทหาร / ครู (3 ดาว - Rare)
+    const isNotable = occupation.includes("wonderbolt") || occupation.includes("guard") ||
+                      occupation.includes("teacher") || occupation.includes("mayor") ||
+                      name.includes("trixie") || name.includes("zecora") || name.includes("big mac") ||
+                      name.includes("granny smith") || name.includes("maud") || name.includes("spitfire");
+
+    // 4. ระดับสายพันธุ์พิเศษ ยูนิคอร์น / เพกาซัส / มังกร (2 ดาว - Uncommon)
+    const isMagicalOrWinged = kind.includes("unicorn") || kind.includes("pegasus") || kind.includes("griffon") || kind.includes("dragon");
+
+    if (isRoyalty) {
+        stars = 5;
+        price = 10000;
+        rarityText = "Legendary (ระดับเจ้าหญิง / ชนชั้นสูง / อลิคอร์น)";
+    } else if (isKeyChar) {
+        stars = 4;
+        price = 5000;
+        rarityText = "Epic (ตัวละครหลัก / ผู้พิทักษ์มิตรภาพ)";
+    } else if (isNotable) {
+        stars = 3;
+        price = 2000;
+        rarityText = "Rare (ตัวละครสมทบสำคัญ / อาชีพพิเศษ)";
+    } else if (isMagicalOrWinged) {
+        stars = 2;
+        price = 800;
+        rarityText = "Uncommon (ยูนิคอร์น / เพกาซัส / เผ่าพิเศษ)";
+    }
+
+    return {
+        stars,
+        starString: "⭐".repeat(stars),
+        price: `฿${price.toLocaleString()}`,
+        rarityText
+    };
+}
+
+async function loadCharacters() {
+    try {
+        const response = await fetch("/characters");
+        if (!response.ok) throw new Error("ไม่สามารถโหลดข้อมูลได้");
+
+        const result = await response.json();
+        characters = result.data;
+        displayCharacters();
+    } catch (error) {
+        console.error(error);
+        document.getElementById("characters").innerHTML = `
+            <div style="text-align:center; grid-column:1/-1; padding:40px; color:red;">
+                ❌ ไม่สามารถโหลดข้อมูลตัวละครได้
+            </div>
+        `;
+    }
+}
+
+function displayCharacters() {
+    const container = document.getElementById("characters");
+    const keyword = document.getElementById("search").value.toLowerCase();
+    const selectedSeason = document.getElementById("seasonFilter").value;
+    const sort = document.getElementById("sort").value;
+
+    let list = characters.filter(character => {
+        const name = (character.name || "").toLowerCase();
+        const alias = (character.alias || "").toLowerCase();
+        const matchesName = name.includes(keyword) || alias.includes(keyword);
+
+        const matchesSeason = checkSeasonMatch(character.seasons, selectedSeason);
+
+        return matchesName && matchesSeason;
+    });
+
+    // อัปเดตแสดงจำนวนตัวละครตามซีซัน/คำค้นหา
+    const seasonLabel = selectedSeason === "all" ? "ทุกซีซัน" : `Season ${selectedSeason}`;
+    const seasonCountDisplay = document.getElementById("seasonCountDisplay");
+    if (seasonCountDisplay) {
+        if (keyword) {
+            seasonCountDisplay.textContent = `พบตัวละครที่ตรงกับคำค้นหา "${keyword}" ใน ${seasonLabel} จำนวนทั้งหมด ${list.length} ตัว`;
+        } else {
+            seasonCountDisplay.textContent = `จำนวนตัวละครที่ปรากฏใน ${seasonLabel}: ${list.length} ตัว`;
+        }
+    }
+
+    list.sort((a, b) => {
+        const aMane = isMane6(a.name);
+        const bMane = isMane6(b.name);
+
+        if (aMane && !bMane) return -1;
+        if (!aMane && bMane) return 1;
+
+        if (sort === "az") return (a.name || "").localeCompare(b.name || "");
+        if (sort === "za") return (b.name || "").localeCompare(a.name || "");
+        return 0;
+    });
+
+    container.innerHTML = "";
+
+    if (list.length === 0) {
+        container.innerHTML = `
+            <div style="text-align:center; grid-column:1/-1; padding:50px; color:#ab47bc; font-size:18px;">
+                🦄 ไม่พบตัวละครม้าโพนี่ที่ปรากฏใน ${seasonLabel}
+            </div>
+        `;
+        return;
+    }
+
+    list.forEach(character => {
+        const card = document.createElement("div");
+        const meta = getCardPriceAndRarity(character);
+        const isMain = isMane6(character.name);
+        
+        card.className = `card rarity-${meta.stars} ${isMain ? 'mane6' : ''}`;
+        const image = character.image && character.image.length ? character.image[0] : "";
+
+        card.innerHTML = `
+            <img src="${image}" alt="${character.name}">
+            <h3>${character.name}</h3>
+            <div class="stars">${meta.starString}</div>
+            <div class="price-tag">${meta.price}</div>
+        `;
+
+        card.onclick = () => openCharacterModal(character);
+        container.appendChild(card);
+    });
+}
+
+function openCharacterModal(character) {
+    selectedCharacter = character;
+    const meta = getCardPriceAndRarity(character);
+    const image = character.image && character.image.length ? character.image[0] : "";
+
+    document.getElementById("modalImage").src = image;
+    document.getElementById("modalName").textContent = character.name;
+    document.getElementById("modalRarityStars").textContent = meta.starString;
+    document.getElementById("modalRarityText").textContent = meta.rarityText;
+    document.getElementById("modalPrice").textContent = meta.price;
+
+    document.getElementById("modalSex").textContent = character.sex || "ไม่มีข้อมูล";
+    document.getElementById("modalAbility").textContent = character.occupation || (Array.isArray(character.kind) ? character.kind.join(", ") : "ไม่มีข้อมูล");
+    document.getElementById("modalEpisodes").textContent = character.episodeCount || "ไม่มีข้อมูล";
+    document.getElementById("modalSeasons").textContent = Array.isArray(character.seasons) ? character.seasons.join(", ") : (character.seasons || "ไม่มีข้อมูล");
+
+    document.getElementById("replaceMenu").style.display = "none";
+
+    const addBtn = document.getElementById("addBtn");
+    const replacePromptBtn = document.getElementById("replacePromptBtn");
+
+    const isAlreadyInTop3 = top3.some(item => item && item.name === character.name);
+
+    if (isAlreadyInTop3) {
+        addBtn.style.display = "inline-block";
+        addBtn.disabled = true;
+        addBtn.textContent = "✓ สะสมแล้วใน Top 3";
+        replacePromptBtn.style.display = "none";
+    } else if (top3.length >= 3) {
+        addBtn.style.display = "none";
+        replacePromptBtn.style.display = "inline-block";
+    } else {
+        addBtn.style.display = "inline-block";
+        addBtn.disabled = false;
+        addBtn.textContent = "+ เพิ่มใน My Top 3";
+        replacePromptBtn.style.display = "none";
+    }
+
+    document.getElementById("characterModal").style.display = "flex";
+}
+
+function closeCharacterModal() {
+    document.getElementById("characterModal").style.display = "none";
+    selectedCharacter = null;
+}
+
+function addCharacter() {
+    if (!selectedCharacter) return;
+    if (top3.length < 3 && !top3.some(item => item && item.name === selectedCharacter.name)) {
+        top3.push(selectedCharacter);
+        updateCollectionUI();
+        closeCharacterModal();
+    }
+}
+
+function toggleReplaceMenu() {
+    const menu = document.getElementById("replaceMenu");
+    const options = document.getElementById("replaceOptions");
+    if (menu.style.display === "block") {
+        menu.style.display = "none";
+        return;
+    }
+
+    options.innerHTML = "";
+    top3.forEach((item, index) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-replace";
+        btn.style.fontSize = "13px";
+        btn.style.padding = "6px 12px";
+        btn.textContent = `แทนที่อันดับ ${index + 1}: ${item.name}`;
+        btn.onclick = () => replaceCharacter(index);
+        options.appendChild(btn);
+    });
+
+    menu.style.display = "block";
+}
+
+function replaceCharacter(index) {
+    if (!selectedCharacter) return;
+    top3[index] = selectedCharacter;
+    updateCollectionUI();
+    closeCharacterModal();
+}
+
+function removeCharacter(index) {
+    top3.splice(index, 1);
+    updateCollectionUI();
+}
+
+function updateCollectionUI() {
+    document.getElementById("collectionCount").textContent = top3.length;
+    const container = document.getElementById("top3");
+    container.innerHTML = "";
+
+    for (let i = 0; i < 3; i++) {
+        const slot = document.createElement("div");
+        slot.className = "slot";
+
+        if (top3[i]) {
+            const char = top3[i];
+            const img = char.image && char.image.length ? char.image[0] : "";
+            slot.innerHTML = `
+                <h4 style="margin:0 0 10px; color:#ec407a;">อันดับที่ ${i + 1}</h4>
+                <img src="${img}" alt="${char.name}">
+                <h3 style="margin:8px 0 4px; color:#6a1b9a;">${char.name}</h3>
+                <button class="btn-danger" onclick="removeCharacter(${i})">🗑️ ลบออก</button>
+            `;
+        } else {
+            slot.innerHTML = `
+                <h4 style="margin:0 0 10px; color:#9e9e9e;">อันดับที่ ${i + 1}</h4>
+                <p style="color:#bdbdbd; margin:0;">ยังไม่มีข้อมูล</p>
+            `;
+        }
+        container.appendChild(slot);
+    }
+}
+
+// ผูกอีเวนต์ค้นหา คัดกรอง และเรียงลำดับ
+document.getElementById("search").addEventListener("input", displayCharacters);
+document.getElementById("seasonFilter").addEventListener("change", displayCharacters);
+document.getElementById("sort").addEventListener("change", displayCharacters);
+
+// เริ่มต้นแสดงผลการ์ดสะสมเปล่า
+updateCollectionUI();
+</script>
+
+</body>
+</html>
